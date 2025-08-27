@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recorder - Page 2 (11-20)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .number-column {
+            width: 80px;
+            text-align: center;
+            font-weight: bold;
+            background-color: #f8f9fa;
+        }
+
+        .upload-column {
+            width: 200px;
+        }
+
+        .record-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+
+        .record-button:hover {
+            background-color: #c82333;
+        }
+
+        .record-button.recording {
+            background-color: #ffc107;
+            color: #333;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .record-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        .record-info.recording {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .record-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .control-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .play-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .download-all {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .download-all:hover {
+            background-color: #c82333;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .nav-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+            
+            .record-button {
+                padding: 12px 16px;
+                font-size: 16px;
+                min-height: 44px;
+            }
+            
+            .control-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+            
+            .download-all {
+                padding: 16px 24px;
+                font-size: 18px;
+                min-height: 50px;
+            }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+            .record-button, .control-btn, .download-all, .nav-btn {
+                -webkit-appearance: none;
+                border-radius: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Audio Recorder - Page 2</h1>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="number-column">No.</th>
+                        <th class="upload-column">Record File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="number-column">11</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn11" onclick="toggleRecording(11)">Start Recording</button>
+                            <div class="record-info" id="recordInfo11"></div>
+                            <audio class="audio-player" id="audio11" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls11" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(11)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(11)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">12</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn12" onclick="toggleRecording(12)">Start Recording</button>
+                            <div class="record-info" id="recordInfo12"></div>
+                            <audio class="audio-player" id="audio12" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls12" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(12)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(12)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">13</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn13" onclick="toggleRecording(13)">Start Recording</button>
+                            <div class="record-info" id="recordInfo13"></div>
+                            <audio class="audio-player" id="audio13" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls13" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(13)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(13)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">14</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn14" onclick="toggleRecording(14)">Start Recording</button>
+                            <div class="record-info" id="recordInfo14"></div>
+                            <audio class="audio-player" id="audio14" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls14" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(14)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(14)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">15</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn15" onclick="toggleRecording(15)">Start Recording</button>
+                            <div class="record-info" id="recordInfo15"></div>
+                            <audio class="audio-player" id="audio15" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls15" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(15)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(15)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">16</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn16" onclick="toggleRecording(16)">Start Recording</button>
+                            <div class="record-info" id="recordInfo16"></div>
+                            <audio class="audio-player" id="audio16" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls16" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(16)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(16)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">17</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn17" onclick="toggleRecording(17)">Start Recording</button>
+                            <div class="record-info" id="recordInfo17"></div>
+                            <audio class="audio-player" id="audio17" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls17" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(17)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(17)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">18</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn18" onclick="toggleRecording(18)">Start Recording</button>
+                            <div class="record-info" id="recordInfo18"></div>
+                            <audio class="audio-player" id="audio18" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls18" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(18)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(18)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">19</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn19" onclick="toggleRecording(19)">Start Recording</button>
+                            <div class="record-info" id="recordInfo19"></div>
+                            <audio class="audio-player" id="audio19" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls19" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(19)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(19)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="number-column">20</td>
+                        <td class="upload-column">
+                            <button class="record-button" id="recordBtn20" onclick="toggleRecording(20)">Start Recording</button>
+                            <div class="record-info" id="recordInfo20"></div>
+                            <audio class="audio-player" id="audio20" controls style="display: none;"></audio>
+                            <div class="record-controls" id="controls20" style="display: none;">
+                                <button class="control-btn play-btn" onclick="playRecording(20)">Play</button>
+                                <button class="control-btn delete-btn" onclick="deleteRecording(20)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <button class="download-all" onclick="downloadAllData()">Download Audio Files (ZIP)</button>
+            
+            <!-- Chrome 다운로드 안내 -->
+            <div style="margin-top: 20px; text-align: center;">
+                <h4 style="color: #28a745; margin-bottom: 10px;">💡 iPhone에서 파일 다운로드하기</h4>
+                <div style="background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin: 0 auto; max-width: 500px;">
+                    <p style="margin: 0; color: #155724; font-size: 14px; line-height: 1.5;">
+                        <strong>iPhone에서 파일 다운로드가 안 될 때:</strong><br>
+                        • <strong>Chrome 브라우저</strong>를 사용하세요!<br>
+                        • Chrome에서는 ZIP 파일 다운로드가 정상 작동합니다<br>
+                        • 녹음은 Safari, 다운로드는 Chrome이 최적입니다
+                    </p>
+                </div>
+            </div>
+            
+            <div id="iosNotice" style="display: none; margin-top: 15px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; color: #856404;">
+                <strong>📱 iOS User Guide:</strong><br>
+                • Use Safari browser for best compatibility<br>
+                • Check Settings > Safari > Microphone permissions<br>
+                • <strong>💡 Chrome browser works better for file download!</strong><br>
+                • <strong>For file download: Use Chrome browser on iPhone</strong><br>
+                • <strong>For recording: Safari recommended</strong>
+            </div>
+            
+            <div id="androidNotice" style="display: none; margin-top: 15px; padding: 10px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 5px; color: #0c5460;">
+                <strong>🤖 Android User Guide:</strong><br>
+                • Use Chrome browser for best compatibility<br>
+                • Check Settings > Apps > Chrome > Permissions > Microphone<br>
+                • Other browsers may have limited recording support
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="page1.html" class="nav-btn">← Previous</a>
+            <span style="color: #666; font-size: 14px;">Page 2 of 3</span>
+            <a href="page3.html" class="nav-btn">Next →</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <script>
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let currentRecordingRow = null;
+        let audioBlobs = {};
+
+        function toggleRecording(rowNum) {
+            const recordBtn = document.getElementById(`recordBtn${rowNum}`);
+            const recordInfo = document.getElementById(`recordInfo${rowNum}`);
+            const audioPlayer = document.getElementById(`audio${rowNum}`);
+            const controls = document.getElementById(`controls${rowNum}`);
+
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                recordBtn.textContent = 'Start Recording';
+                recordBtn.classList.remove('recording');
+                recordInfo.textContent = 'Recording completed!';
+                recordInfo.classList.remove('recording');
+                currentRecordingRow = null;
+            } else {
+                if (currentRecordingRow && currentRecordingRow !== rowNum) {
+                    alert('Another row is currently recording. Please stop it first.');
+                    return;
+                }
+                
+                startRecording(rowNum);
+                recordBtn.textContent = 'Stop Recording';
+                recordBtn.classList.add('recording');
+                recordInfo.textContent = 'Recording...';
+                recordInfo.classList.add('recording');
+                currentRecordingRow = rowNum;
+            }
+        }
+
+        async function startRecording(rowNum) {
+            try {
+                const audioConstraints = {
+                    audio: {
+                        echoCancellation: { ideal: true },
+                        noiseSuppression: { ideal: true },
+                        autoGainControl: { ideal: true },
+                        sampleRate: { ideal: 44100 },
+                        channelCount: { ideal: 1 },
+                        latency: { ideal: 0.01 }
+                    }
+                };
+
+                if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                    audioConstraints.audio = {
+                        ...audioConstraints.audio,
+                        sampleRate: { ideal: 22050 },
+                        channelCount: { ideal: 1 }
+                    };
+                }
+
+                if (/Android/.test(navigator.userAgent)) {
+                    audioConstraints.audio = {
+                        ...audioConstraints.audio,
+                        sampleRate: { ideal: 44100 },
+                        channelCount: { ideal: 1 }
+                    };
+                }
+
+                const stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+                
+                let mimeType = 'audio/webm;codecs=opus';
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/webm';
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/mp4';
+                }
+                if (!MediaRecorder.isTypeSupported(mimeType)) {
+                    mimeType = 'audio/mp4;codecs=mp4a';
+                }
+                
+                if (!MediaRecorder.isTypeSupported(mimeType) && (/iPad|iPhone|iPod|Android/.test(navigator.userAgent))) {
+                    await startRecordingWithAudioContext(stream, rowNum);
+                    return;
+                }
+                
+                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: mimeType });
+                    convertToWav(audioBlob, rowNum);
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorder.start();
+            } catch (error) {
+                console.error('Microphone access error:', error);
+                
+                let errorMessage = '';
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Microphone access denied.\n\nSolution:\n1. Click the lock icon in the browser address bar\n2. Change "Microphone" permission to "Allow"\n3. Refresh the page and try again';
+                    
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Use Safari browser on iOS.';
+                    } else if (/Android/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Use Chrome browser on Android.';
+                    }
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'Microphone not found.\n\nCheck:\n1. Microphone is connected\n2. No other program is using the microphone\n3. Check microphone permissions in system settings';
+                    
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Check Settings > Safari > Microphone permissions on iOS.';
+                    } else if (/Android/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Check Settings > Apps > Chrome > Permissions on Android.';
+                    }
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage = 'Cannot access microphone.\n\nCheck:\n1. No other program is using the microphone\n2. Close browser completely and restart\n3. Restart system';
+                    
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Use Safari browser on iOS.';
+                    } else if (/Android/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Use Chrome browser on Android.';
+                    }
+                } else {
+                    errorMessage = 'Error occurred while accessing microphone.\n\nError: ' + error.message;
+                    
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Use Safari browser on iOS.';
+                    } else if (/Android/.test(navigator.userAgent)) {
+                        errorMessage += '\n\n※ Use Chrome browser on Android.';
+                    }
+                }
+                
+                alert(errorMessage);
+            }
+        }
+
+        async function startRecordingWithAudioContext(stream, rowNum) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                const processor = audioContext.createScriptProcessor(4096, 1, 1);
+                
+                const audioChunks = [];
+                
+                processor.onaudioprocess = (e) => {
+                    const inputData = e.inputBuffer.getChannelData(0);
+                    audioChunks.push(new Float32Array(inputData));
+                };
+                
+                source.connect(processor);
+                processor.connect(audioContext.destination);
+                
+                window.stopRecordingWithAudioContext = () => {
+                    processor.disconnect();
+                    source.disconnect();
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    const wavBlob = convertFloat32ArrayToWav(audioChunks, audioContext.sampleRate);
+                    audioBlobs[rowNum] = wavBlob;
+                    
+                    const audioPlayer = document.getElementById(`audio${rowNum}`);
+                    const controls = document.getElementById(`controls${rowNum}`);
+                    const recordInfo = document.getElementById(`recordInfo${rowNum}`);
+                    
+                    audioPlayer.src = URL.createObjectURL(wavBlob);
+                    audioPlayer.style.display = 'block';
+                    controls.style.display = 'flex';
+                    recordInfo.textContent = 'WAV recording completed!';
+                    
+                    const recordBtn = document.getElementById(`recordBtn${rowNum}`);
+                    recordBtn.textContent = 'Start Recording';
+                    recordBtn.classList.remove('recording');
+                    recordBtn.onclick = () => toggleRecording(rowNum);
+                    
+                    window.currentRecordingRow = null;
+                };
+                
+                const recordBtn = document.getElementById(`recordBtn${rowNum}`);
+                recordBtn.textContent = 'Stop Recording';
+                recordBtn.classList.add('recording');
+                recordBtn.onclick = window.stopRecordingWithAudioContext;
+                
+                window.currentRecordingRow = rowNum;
+                
+            } catch (error) {
+                console.error('AudioContext recording error:', error);
+                alert('Error occurred while recording on iOS. Please use Safari browser.');
+            }
+        }
+
+        function convertFloat32ArrayToWav(audioChunks, sampleRate) {
+            const length = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
+            const arrayBuffer = new ArrayBuffer(44 + length * 2);
+            const view = new DataView(arrayBuffer);
+            
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + length * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, length * 2, true);
+            
+            let offset = 44;
+            let chunkIndex = 0;
+            let sampleIndex = 0;
+            
+            for (let i = 0; i < length; i++) {
+                if (sampleIndex >= audioChunks[chunkIndex].length) {
+                    chunkIndex++;
+                    sampleIndex = 0;
+                }
+                
+                const sample = Math.max(-1, Math.min(1, audioChunks[chunkIndex][sampleIndex]));
+                view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                offset += 2;
+                sampleIndex++;
+            }
+            
+            return new Blob([arrayBuffer], { type: 'audio/wav' });
+        }
+
+        function playRecording(rowNum) {
+            const audioPlayer = document.getElementById(`audio${rowNum}`);
+            audioPlayer.play();
+        }
+
+        async function convertToWav(audioBlob, rowNum) {
+            try {
+                const arrayBuffer = await audioBlob.arrayBuffer();
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                const wavBlob = audioBufferToWav(audioBuffer);
+                audioBlobs[rowNum] = wavBlob;
+                
+                const audioPlayer = document.getElementById(`audio${rowNum}`);
+                const controls = document.getElementById(`controls${rowNum}`);
+                
+                audioPlayer.src = URL.createObjectURL(wavBlob);
+                audioPlayer.style.display = 'block';
+                controls.style.display = 'flex';
+                
+                const recordInfo = document.getElementById(`recordInfo${rowNum}`);
+                recordInfo.textContent = 'WAV conversion completed!';
+                
+            } catch (error) {
+                console.error('WAV conversion error:', error);
+                audioBlobs[rowNum] = audioBlob;
+                
+                const audioPlayer = document.getElementById(`audio${rowNum}`);
+                const controls = document.getElementById(`controls${rowNum}`);
+                
+                audioPlayer.src = URL.createObjectURL(audioBlob);
+                audioPlayer.style.display = 'block';
+                controls.style.display = 'flex';
+                
+                const recordInfo = document.getElementById(`recordInfo${rowNum}`);
+                recordInfo.textContent = 'Recording completed!';
+            }
+        }
+
+        function audioBufferToWav(buffer) {
+            const length = buffer.length;
+            const numberOfChannels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            const arrayBuffer = new ArrayBuffer(44 + length * numberOfChannels * 2);
+            const view = new DataView(arrayBuffer);
+            
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + length * numberOfChannels * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numberOfChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numberOfChannels * 2, true);
+            view.setUint16(32, numberOfChannels * 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, length * numberOfChannels * 2, true);
+            
+            let offset = 44;
+            for (let i = 0; i < length; i++) {
+                for (let channel = 0; channel < numberOfChannels; channel++) {
+                    const sample = Math.max(-1, Math.min(1, buffer.getChannelData(channel)[i]));
+                    view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                    offset += 2;
+                }
+            }
+            
+            return new Blob([arrayBuffer], { type: 'audio/wav' });
+        }
+
+        function deleteRecording(rowNum) {
+            const recordBtn = document.getElementById(`recordBtn${rowNum}`);
+            const recordInfo = document.getElementById(`recordInfo${rowNum}`);
+            const audioPlayer = document.getElementById(`audio${rowNum}`);
+            const controls = document.getElementById(`controls${rowNum}`);
+
+            recordBtn.textContent = 'Start Recording';
+            recordBtn.classList.remove('recording');
+            recordInfo.textContent = '';
+            recordInfo.classList.remove('recording');
+            audioPlayer.style.display = 'none';
+            controls.style.display = 'none';
+            
+            delete audioBlobs[rowNum];
+        }
+
+        function downloadAllData() {
+            downloadAudioFiles();
+        }
+
+        async function downloadAudioFiles() {
+            const JSZip = window.JSZip;
+            if (!JSZip) {
+                alert('JSZip library not loaded. Please download audio files individually.');
+                return;
+            }
+
+            const zip = new JSZip();
+            let hasAudioFiles = false;
+
+            for (let i = 11; i <= 20; i++) {
+                if (audioBlobs[i]) {
+                    // WAV 형식으로 저장 (편집 소프트웨어 호환성)
+                    const fileName = `Row${i}_AudioFile.wav`;
+                    zip.file(fileName, audioBlobs[i]);
+                    hasAudioFiles = true;
+                }
+            }
+
+            if (hasAudioFiles) {
+                try {
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    
+                    // Safari 호환성을 위한 다운로드 방법
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent) || /Safari/.test(navigator.userAgent)) {
+                        // Safari 전용 다운로드 방법
+                        const url = URL.createObjectURL(zipBlob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'page2_audio_files.zip';
+                        link.style.display = 'none';
+                        
+                        // Safari에서 강제로 다운로드 트리거
+                        document.body.appendChild(link);
+                        link.click();
+                        
+                        // 메모리 정리
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                        }, 100);
+                        
+                        alert('Safari에서 다운로드가 시작되었습니다. 다운로드 폴더를 확인해주세요.');
+                    } else {
+                        // 일반 브라우저용 다운로드
+                        const link = document.createElement('a');
+                        const url = URL.createObjectURL(zipBlob);
+                        link.setAttribute('href', url);
+                        link.setAttribute('download', 'page2_audio_files.zip');
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }
+                } catch (error) {
+                    console.error('ZIP 파일 생성 오류:', error);
+                    alert('ZIP 파일 생성 중 오류가 발생했습니다.');
+                }
+            } else {
+                alert('다운로드할 녹음 파일이 없습니다. 먼저 녹음을 완료해주세요.');
+            }
+        }
+
+        // 개별 파일 다운로드 (Safari에서 더 안정적)
+        function downloadIndividualFile(rowNum) {
+            const audioBlob = audioBlobs[rowNum];
+            if (audioBlob) {
+                const fileName = `Row${rowNum}_AudioFile.wav`;
+                
+                // Safari에서 더 안정적인 다운로드 방법
+                if (/iPad|iPhone|iPod/.test(navigator.userAgent) || /Safari/.test(navigator.userAgent)) {
+                    // Safari 전용: 새 창에서 열기
+                    const url = URL.createObjectURL(audioBlob);
+                    const newWindow = window.open(url, '_blank');
+                    
+                    if (newWindow) {
+                        // 새 창이 열리면 사용자가 수동으로 저장할 수 있음
+                        setTimeout(() => {
+                            newWindow.close();
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                        
+                        alert(`Row ${rowNum} audio file opened in new window. Right-click and select "Save As" to download.`);
+                    } else {
+                        // 팝업 차단된 경우 대체 방법
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.target = '_blank';
+                        link.textContent = `Download Row ${rowNum}`;
+                        link.style.display = 'block';
+                        link.style.margin = '10px';
+                        link.style.padding = '10px';
+                        link.style.backgroundColor = '#007bff';
+                        link.style.color = 'white';
+                        link.style.textDecoration = 'none';
+                        link.style.borderRadius = '5px';
+                        link.style.textAlign = 'center';
+                        
+                        document.body.appendChild(link);
+                        
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            URL.revokeObjectURL(url);
+                        }, 5000);
+                        
+                        alert(`Row ${rowNum} download link created. Click the blue button above to download.`);
+                    }
+                } else {
+                    // 일반 브라우저용 다운로드
+                    const url = URL.createObjectURL(audioBlob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    alert(`Row ${rowNum} audio file downloaded successfully.`);
+                }
+            } else {
+                alert(`No audio file found for Row ${rowNum}. Please record it first.`);
+            }
+        }
+
+        // 이메일로 모든 파일 전송 (iOS Safari에서 가장 안정적)
+        function sendAllFilesByEmail() {
+            const hasAudioFiles = Object.keys(audioBlobs).length > 0;
+            
+            if (!hasAudioFiles) {
+                alert('전송할 녹음 파일이 없습니다. 먼저 녹음을 완료해주세요.');
+                return;
+            }
+            
+            // iOS Safari에서 이메일 앱 열기
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                // 이메일 내용 준비
+                let emailBody = '녹음된 오디오 파일들입니다.\n\n';
+                emailBody += '녹음된 행들:\n';
+                
+                Object.keys(audioBlobs).forEach(rowNum => {
+                    emailBody += `- ${rowNum}번 행\n`;
+                });
+                
+                emailBody += '\n\n※ iOS Safari에서는 파일을 직접 첨부할 수 없습니다.\n';
+                emailBody += '※ 녹음된 파일을 수동으로 저장하려면:\n';
+                emailBody += '1. 각 행의 녹음 버튼을 다시 클릭\n';
+                emailBody += '2. "공유" 버튼 선택\n';
+                emailBody += '3. "파일" 앱에 저장\n';
+                emailBody += '4. 이메일에 수동으로 첨부\n\n';
+                emailBody += '또는 데스크톱에서 접속하여 파일을 다운로드하세요.';
+                
+                // 이메일 앱 열기
+                const mailtoLink = `mailto:?subject=Audio Recording Files&body=${encodeURIComponent(emailBody)}`;
+                window.location.href = mailtoLink;
+                
+                alert('이메일 앱이 열렸습니다. 위의 안내에 따라 파일을 수동으로 첨부하거나, 데스크톱에서 접속하여 다운로드하세요.');
+                
+            } else {
+                // 데스크톱 브라우저에서는 일반 다운로드
+                downloadAllData();
+            }
+        }
+
+        function checkIOSAndShowNotice() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const iosNotice = document.getElementById('iosNotice');
+            const androidNotice = document.getElementById('androidNotice');
+            
+            if (isIOS) {
+                iosNotice.style.display = 'block';
+                androidNotice.style.display = 'none';
+            } else {
+                iosNotice.style.display = 'none';
+                androidNotice.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('load', () => {
+            checkIOSAndShowNotice();
+        });
+    </script>
+</body>
+</html>
